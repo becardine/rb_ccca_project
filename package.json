@@ -1,0 +1,22 @@
+{
+	"name": "ccca",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "tsc && jest ./dist",
+		"coverage": "tsc && jest ./dist --coverage"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@types/sinon": "^10.0.19",
+		"jest": "^29.7.0",
+		"sinon": "^16.1.0",
+		"typescript": "^5.2.2"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.5"
+	}
+}
