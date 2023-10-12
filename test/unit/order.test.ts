@@ -1,8 +1,8 @@
-import Coupon from '../src/coupon'
-import DefaultFreightCalculator from '../src/defaultFreightCalculator'
-import FixedFreightCalculator from '../src/fixedFreightCalculator'
-import Item from '../src/item'
-import Order from '../src/order'
+import Coupon from '../../src/domain/entity/coupon'
+import DefaultFreightCalculator from '../../src/domain/entity/defaultFreightCalculator'
+import FixedFreightCalculator from '../../src/domain/entity/fixedFreightCalculator'
+import Item from '../../src/domain/entity/item'
+import Order from '../../src/domain/entity/order'
 
 test('Deve criar um pedido vazio com CPF válido', function () {
 	const cpf = '935.411.347-80'
