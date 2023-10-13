@@ -1,17 +1,21 @@
-import PlaceOrder from '../../src/application/usecase/placeOrder'
-import CouponRepositoryMemory from '../../src/infra/repository/memory/couponRepositoryMemory'
-import ItemRepositoryMemory from '../../src/infra/repository/memory/itemRepositoryMemory'
-import OrderRepositoryMemory from '../../src/infra/repository/memory/orderRepositoryMemory'
+import PlaceOrder from '../../src/application/usecase/place_order/placeOrder'
+import PgPromiseConnectionAdapter from '../../src/infra/database/pgPromiseConnectionAdapter'
+import CouponRepositoryDatabase from '../../src/infra/repository/database/couponRepositoryDatabase'
+import ItemRepositoryDatabase from '../../src/infra/repository/database/itemRepositoryDatabase'
+import OrderRepositoryDatabase from '../../src/infra/repository/database/orderRepositoryDatabase'
+
+let placeOrder: PlaceOrder
+let orderRepository: OrderRepositoryDatabase
+
+beforeEach(function () {
+	const connection = PgPromiseConnectionAdapter.getInstance()
+	const itemRepository = new ItemRepositoryDatabase(connection)
+	orderRepository = new OrderRepositoryDatabase(connection)
+	const couponRepository = new CouponRepositoryDatabase(connection)
+	placeOrder = new PlaceOrder(itemRepository, orderRepository, couponRepository)
+})
 
 test('Deve fazer um pedido', async function () {
-	const itemRepository = new ItemRepositoryMemory()
-	const orderRepository = new OrderRepositoryMemory()
-	const couponRepository = new CouponRepositoryMemory()
-	const placeOrder = new PlaceOrder(
-		itemRepository,
-		orderRepository,
-		couponRepository,
-	)
 	const input = {
 		cpf: '839.435.452-10',
 		orderItems: [
@@ -23,18 +27,10 @@ test('Deve fazer um pedido', async function () {
 		coupon: 'VALE20',
 	}
 	const output = await placeOrder.execute(input)
-	expect(output.total).toBe(88)
+	expect(output.total).toBe(138)
 })
 
 test('Deve fazer um pedido com cálculo de frete', async function () {
-	const itemRepository = new ItemRepositoryMemory()
-	const orderRepository = new OrderRepositoryMemory()
-	const couponRepository = new CouponRepositoryMemory()
-	const placeOrder = new PlaceOrder(
-		itemRepository,
-		orderRepository,
-		couponRepository,
-	)
 	const input = {
 		cpf: '839.435.452-10',
 		orderItems: [
@@ -46,4 +42,22 @@ test('Deve fazer um pedido com cálculo de frete', async function () {
 	}
 	const output = await placeOrder.execute(input)
 	expect(output.total).toBe(6350)
+})
+
+test('Deve fazer um pedido com código', async function () {
+	const input = {
+		cpf: '839.435.452-10',
+		orderItems: [
+			{ idItem: 4, quantity: 1 },
+			{ idItem: 5, quantity: 1 },
+			{ idItem: 6, quantity: 3 },
+		],
+		date: new Date('2021-12-10'),
+	}
+	const output = await placeOrder.execute(input)
+	expect(output.code).toBe('202100000001')
+})
+
+afterEach(async function () {
+	await orderRepository.clear()
 })
