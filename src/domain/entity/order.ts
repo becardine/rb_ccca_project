@@ -35,6 +35,10 @@ export default class Order {
 		this.coupon = coupon
 	}
 
+	getFreight() {
+		return this.freight
+	}
+
 	getCode() {
 		return this.code.value
 	}
@@ -45,10 +49,6 @@ export default class Order {
 
 	getOrderItems() {
 		return this.orderItems
-	}
-
-	getFreight() {
-		return this.freight
 	}
 
 	getTotal() {

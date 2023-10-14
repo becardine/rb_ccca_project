@@ -1,9 +1,11 @@
 import DefaultFreightCalculator from '../../../domain/entity/defaultFreightCalculator'
 import Order from '../../../domain/entity/order'
+import OrderPlaced from '../../../domain/event/orderPlaced'
 import RepositoryFactory from '../../../domain/factory/repositoryFactory'
 import CouponRepository from '../../../domain/repository/couponRepository'
 import ItemRepository from '../../../domain/repository/itemRepository'
 import OrderRepository from '../../../domain/repository/orderRepository'
+import Broker from '../../../infra/broker/broker'
 import PlaceOrderInput from './placeOrderInput'
 import PlaceOrderOutput from './placeOrderOutput'
 
@@ -12,7 +14,10 @@ export default class PlaceOrder {
 	couponRepository: CouponRepository
 	orderRepository: OrderRepository
 
-	constructor(readonly repositoryFactory: RepositoryFactory) {
+	constructor(
+		readonly repositoryFactory: RepositoryFactory,
+		readonly broker: Broker,
+	) {
 		this.itemRepository = repositoryFactory.createItemRepository()
 		this.couponRepository = repositoryFactory.createCouponRepository()
 		this.orderRepository = repositoryFactory.createOrderRepository()
@@ -36,6 +41,7 @@ export default class PlaceOrder {
 			if (coupon) order.addCoupon(coupon)
 		}
 		await this.orderRepository.save(order)
+		await this.broker.publish(new OrderPlaced(order))
 		const total = order.getTotal()
 		const output = new PlaceOrderOutput(order.getCode(), total)
 		return output
